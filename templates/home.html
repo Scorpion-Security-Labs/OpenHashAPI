@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Page</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <h3>API Documentation</h3>
+    </div>
+  </header>
+
+  <main>
+  <h1> GET Requests</h1>
+  <div class="container">
+    <h2>GET <code>/api/health</code></h2>
+    
+    <div class="link-wrapper">
+      Fetches information about the server-side configuration.
+      <br>
+      Authenticated: <code>true</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>none</code>
+      <br>
+      Execute request: <a href="/api/health" target="_blank" rel="noopener noreferrer" class="link">
+      </a>
+    </div>
+
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/health \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+  </div>
+
+ <br>
+
+  <div class="container">
+    <h2>GET <code>/api/status</code></h2>
+    
+    <div class="link-wrapper">
+      Returns the status about the downloadable files from the server.
+      <br>
+      Authenticated: <code>false</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>none</code>
+      <br>
+      Execute request: <a href="/api/status" target="_blank" rel="noopener noreferrer" class="link">
+      </a>
+    </div>
+
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/status
+    </div>
+  </div>
+  
+  <br>
+
+  <div class="container">
+      <h2>GET <code>/api/download/FILE/NUM</code></h2>
+    
+    <div class="link-wrapper">
+        Allows the download of files from the server. <code>FILE</code> can be
+        <code>wordlist</code>, <code>rules</code>, and <code>masks</code>.
+      <br>
+      Authenticated: <code>true</code>
+      <br>
+      Query Params: <code>offset</code> <code>contains</code>
+      <code>prepend</code> <code>append</code> <code>toggle</code>
+      <br>
+      <ul>
+          <li>
+              <code>offset</code> will return results starting at Nth position
+          </li>
+          <li>
+              <code>contains</code> will only return results that contain substring
+          </li>
+          <li>
+            <code>prepend</code> will return or exclude results with prepend rules
+          </li>
+          <li>
+              <code>append</code> will return or exclude results with append rules
+          </li>
+          <li>
+              <code>toggle</code> will return or exclude results with toggle rules
+          </li>
+      </ul>
+      <br>
+      Access Role: <code>none</code>
+      <br>
+      Execute request: <a href="/api/download/wordlist/10" target="_blank" rel="noopener noreferrer" class="link">
+      </a>
+    </div>
+
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/download/wordlist/10 \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+    <br>
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/download/rules/10 \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+    <br>
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/download/masks/10 \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+  </div>
+  
+  <br>
+
+  <div class="container">
+    <h2>GET <code>/api/lists</code> & GET <code>/api/lists/LISTNAME</code></h2>
+    
+    <div class="link-wrapper">
+      Fetches information about or returns content of any downloadable files stored on the server.
+      The <code>LISTNAME</code> parameter is the file to return contents of.
+      <br>
+      Authenticated: <code>true</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>canViewPrivateLists</code> in user attributes and
+      <code>allow-private-lists</code> in server configuration
+      <br>
+      Execute request: <a href="/api/lists" target="_blank" rel="noopener noreferrer" class="link">
+      </a>
+    </div>
+
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/lists/ \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+  <br>
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/lists/LISTNAME \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+  </div>
+
+  <h1> POST Requests</h1>
+  <div class="container">
+    <h2>POST <code>/api/found</code></h2>
+    
+    <div class="link-wrapper">
+      Submits new material to the database through the API.
+      <br>
+      Authenticated: <code>true</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>canUpload</code> in user attributes
+      <br>
+    </div>
+
+    <div id="curl-command">curl -X POST \
+      ${baseURL}/api/found \
+      -H 'Authorization: Bearer ${auth_token}' \
+      -H 'Content-Type: application/json' \
+      --data '{
+        "algorithm": "0",
+        "hash-plain": [
+            "5f4dcc3b5aa765d61d8327deb882cf99:password"
+            ]
+        }'
+    </div>
+  </div>
+
+<br>
+
+  <div class="container">
+    <h2>POST <code>/api/search</code></h2>
+    
+    <div class="link-wrapper">
+      Allows searching the database by either <code>hash</code> or <code>plain</code> values.
+      <br>
+      Authenticated: <code>true</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>canSearch</code> in user attributes
+      <br>
+    </div>
+
+    <div id="curl-command">curl -X POST \
+      ${baseURL}/api/search \
+      -H 'Authorization: Bearer ${auth_token}' \
+      -H 'Content-Type: application/json' \
+      --data '{
+          "data": [
+               "5f4dcc3b5aa765d61d8327deb882cf99",
+               "password"
+            ]
+        }'
+    </div>
+  </div>
+
+<br>
+
+  <div class="container">
+    <h2>POST <code>/api/manage</code></h2>
+    
+    <div class="link-wrapper">
+      Allows for the permission management of other users.
+      <br>
+      Authenticated: <code>true</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>canManage</code> in user attributes
+      <br>
+    </div>
+
+    <div id="curl-command">curl -X POST \
+      ${baseURL}/api/manage \
+      -H 'Authorization: Bearer ${auth_token}' \
+      -H 'Content-Type: application/json' \
+      --data '{
+            "userID":0,
+            "canLogin": false,
+            "canSearch": false,
+            "canUpload": false,
+            "canManage": false,
+            "canViewPrivateLists": false,
+            "canEditPrivateLists": false"
+        }'
+    </div>
+  </div>
+
+<br>
+
+  <div class="container">
+    <h2>POST <code>/api/lists</code> & POST <code>/api/lists/LISTNAME</code></h2>
+    
+    <div class="link-wrapper">
+        Creates a new list or updates a posted list with new items. The
+        <code>LISTNAME</code> parameter will attempt to update that file with
+        new items.
+      <br>
+      Authenticated: <code>true</code>
+      <br>
+      Query Params: <code>name</code>
+      <br>
+      <ul>
+          <li>
+              <code>name</code> sets the name when writing a file otherwise ignored
+          </li>
+      </ul>
+      <br>
+      Access Role: <code>canEditPrivateLists</code> in user attributes and
+      <code>allow-private-lists</code> in server configuration
+    </div>
+
+    <div id="curl-command">curl -X POST \
+      ${baseURL}/api/lists \
+      -H 'Authorization: Bearer ${auth_token}' \
+      -H 'Content-Type: text/plain' \
+      --data '5f4dcc3b5aa765d61d8327deb882cf99'
+    </div>
+  <br>
+    <div id="curl-command">curl -X POST \
+      ${baseURL}/api/lists/LISTNAME \
+      -H 'Authorization: Bearer ${auth_token}' \
+      -H 'Content-Type: text/plain' \
+      --data '5f4dcc3b5aa765d61d8327deb882cf99:password'
+    </div>
+  </div>
+
+</main>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const baseURL = window.location.origin;
+  const authToken = document.cookie.match('(^|;)\\s*auth_token=([^;]*)')?.pop();
+
+  const codeBlocks = document.querySelectorAll('#curl-command');
+  codeBlocks.forEach(codeBlock => {
+    codeBlock.textContent = codeBlock.textContent
+      .replace('${auth_token}', authToken)
+      .replace('${baseURL}', baseURL);
+  });
+});
+</script>
+
+  <footer>
+    <div class="copyright">
+      &copy; 2024 All rights reserved.
+    </div>
+  </footer>
+
+</body>
+</html>
+
