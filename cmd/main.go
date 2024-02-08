@@ -45,7 +45,7 @@ func main() {
 	}
 
 	// GENERATE FILES
-	tasks := make(chan func(), 1)
+	tasks := make(chan func(), 2)
 	go func() {
 		for task := range tasks {
 			task()
