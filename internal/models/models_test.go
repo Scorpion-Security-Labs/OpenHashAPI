@@ -173,3 +173,100 @@ func TestValidateUsernameInput(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateJWTCharacters(t *testing.T) {
+	tests := []struct {
+		name  string
+		token string
+		want  bool
+	}{
+		// Valid JWT tokens:
+		{
+			name:  "Valid token with no padding",
+			token: "eyJhbGciOiJIUzI1NiJ9.SFRNTkNWS1I1.QdpNL-YqP_1tBRUd2_u-QNP6Fz-6a_C9-X0aWLVl-8",
+			want:  true,
+		},
+		{
+			name:  "Valid token with base64url padding",
+			token: "eyJhbGciOiJIUzI1NiJ9.SFRNTkNWS1I1.QdpNL-YqP_1tBRUd2_u-QNP6Fz-6a_C9-X0aWLVl-8==",
+			want:  true,
+		},
+
+		// Invalid JWT tokens:
+		{
+			name:  "Missing dot separators",
+			token: "invalidtoken",
+			want:  false,
+		},
+		{
+			name:  "Invalid characters",
+			token: "eyJhbGciOiJIUzI1NiJ9.S!RNTkNWS1I1.QdpNL-YqP_1tBRUd2_u-QNP6Fz-6a_C9-X0aWLVl-8",
+			want:  false,
+		},
+		{
+			name:  "Extra dot separator",
+			token: "eyJhbGciOiJIUzI1NiJ9.SFRNTkNWS1I1..QdpNL-YqP_1tBRUd2_u-QNP6Fz-6a_C9-X0aWLVl-8",
+			want:  false,
+		},
+		{
+			name:  "Invalid padding",
+			token: "eyJhbGciOiJIUzI1NiJ9.SFRNTkNWS1I1.QdpNL-YqP_1tBRUd2_u-QNP6Fz-6a_C9-X0aWLVl-8$",
+			want:  false,
+		},
+		{
+			name:  "Empty string",
+			token: "",
+			want:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ValidateJWTCharacters(tt.token)
+			if got != tt.want {
+				t.Errorf("ValidateJWTCharacters(%q) want: %v, got: %v", tt.token, tt.want, got)
+			}
+		})
+	}
+}
+
+func TestValidateBoolInput(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		// Valid boolean values:
+		{
+			name:  "True",
+			input: "true",
+			want:  true,
+		},
+		{
+			name:  "Talse (case sensitive)",
+			input: "True",
+			want:  false,
+		},
+
+		// Invalid boolean values:
+		{
+			name:  "Empty string",
+			input: "",
+			want:  false,
+		},
+		{
+			name:  "Number",
+			input: "123",
+			want:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ValidateBoolInput(tt.input)
+			if got != tt.want {
+				t.Errorf("ValidateBoolInput(%q) want: %v, got: %v", tt.input, tt.want, got)
+			}
+		})
+	}
+}

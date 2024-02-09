@@ -90,6 +90,7 @@
             .then(response => response.json())
             .then(data => {
               console.log('Registration successful:', data);
+              alert('Registration successful! You may now login.');
               window.location.href = '/login';
             })
             .catch(error => {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home Page</title>
+  <title>OpenHashAPI Home Page</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -146,6 +146,32 @@
   </div>
 
   <h1> POST Requests</h1>
+  <div class="container">
+    <h2>POST <code>/api/login</code></h2>
+    
+    <div class="link-wrapper">
+      Authenticates a user and returns a JWT token.
+      <br>
+      Authenticated: <code>false</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>canLogin</code> in user attributes
+      <br>
+    </div>
+
+    <div id="curl-command">curl -X POST \
+      ${baseURL}/api/login \
+      -H 'Content-Type: application/json' \
+      --data '{
+        "username": "username",
+        "password": "password"
+        }'
+    </div>
+  </div>
+
+<br>
+
   <div class="container">
     <h2>POST <code>/api/found</code></h2>
     
