@@ -28,10 +28,11 @@ COPY /templates /var/www/OpenHashAPI/templates
 # NOTE: Self-signed cert 
 RUN apk update; apk add --no-cache openssl && \
     openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout server.key -out server.crt -subj '/CN=www.OpenHashAPI.com' && \
-    chmod 606 server.key && chmod 606 server.crt && \
+    chmod 604 server.key && chmod 604 server.crt && \
     openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:4096 && \
     openssl rsa -in private_key.pem -pubout -out public_key.pem && \
-    chmod 606 private_key.pem && chmod 606 public_key.pem;
+    chmod 604 private_key.pem && chmod 604 public_key.pem && \
+    chmod 604 /etc/config.json;
 
 # Install packages and create app user
 RUN addgroup --gid 10001 --system nonroot \
