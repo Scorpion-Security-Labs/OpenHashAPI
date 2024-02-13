@@ -1,7 +1,7 @@
 # Dockerfile for OpenHashAPI
 
 # Build Binary then transfer it across layers
-FROM golang:1.21-alpine as build-env
+FROM golang:1.22-alpine as build-env
 RUN mkdir src/app
 WORKDIR /src/app
 COPY ./cmd ./cmd
