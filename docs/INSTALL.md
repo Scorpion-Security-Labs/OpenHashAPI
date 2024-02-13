@@ -26,7 +26,8 @@ The database is installed on the underlying host to provide data persistence, an
 ```
 sudo apt update && sudo apt install -y mysql-server && sudo systemctl start mysql.service
 ```
-> NOTE: Some distros have MySQL/MariaDB installed by default. Check with `sudo systemctl status mysql && sudo systemctl start mysql.service`.
+> [!TIP]
+> Some distros have MySQL/MariaDB installed by default. Check with `sudo systemctl status mysql && sudo systemctl start mysql.service`.
 
 The intructions will also be done in the following screen captures. We will start with a fresh install of Ubuntu 22.04.3 LTS:
 
@@ -34,14 +35,15 @@ The intructions will also be done in the following screen captures. We will star
 ---
 
 ### Securing the Database Installation
-With `mysql` installed, we want to reconfigure the database to be more secure by default.
+With `mysql` installed, we want to reconfigure the database to be more secure by default. Some distributions may not be able to run the following command, if so, please see [Common Issues](#issues-running-mysql_secure_installation).
 
 ```
 sudo mysql_secure_installation
 ```
+> [!TIP]
 > Having issues? See [Common Issues](#issues-running-mysql_secure_installation)
 
-The following shows running `mysql_secure_installation` after installing MySQL with `apt`. For this process select "Y" or "y" for all settings to secure the MySQL installation.
+The following shows running `mysql_secure_installation` after installing MySQL with `apt`. For this process select "Y" or "y" for all settings to secure the MySQL installation. For the password requirement, we would suggest using the strongest value available.
 
 ![Screen capture of running the mysql_secure_installation command in a terminal.](/docs/images/install-3.png)
 ---
@@ -92,12 +94,14 @@ The commands can be executed as a MySQL script or directly through the command l
 ### Create the Database User
 Next, we will need a lower privilege database user named `ohauser` for the application. Ensure you have exited `mysql`.
 
-> Note: The password for the database user is validated to be at least 12 characters and meet complexity requirements with one lower, upper, digit, and special character.
+> [!IMPORTANT]
+> The password for the database user is validated to be at least 12 characters and meet complexity requirements with one lower, upper, digit, and special character.
 
 ```
 sudo mysql --execute "CREATE USER 'ohauser'@'localhost' IDENTIFIED BY 'password';"
 ```
-> Note please set a secure password between 12 and 18 characters. This account will be associated with the database.
+> [!TIP]
+> Please set a secure password between 12 and 18 characters. This account will be associated with the database.
 
 Lastly, we will give them permissions over the database and apply those privileges:
 ```
@@ -118,6 +122,9 @@ The application is run in a containerized environment. To do this, we will need 
 ```
 sudo apt update && sudo apt install -y docker.io
 ```
+
+> [!NOTE]
+> [Offical install documentation](https://docs.docker.com/engine/install/) (external link)
 
 ---
 
@@ -148,6 +155,7 @@ The server uses a JSON configuration file to set several variables used by the s
 * `GenerateMasks`: If the server should start a process to make a mask list.
 * `AllowPrivateLists`: If the server should allow the creation and downloading of private lists.
 
+> [!IMPORTANT]
 > **Ensure that the `open-registration` parameter is set; otherwise, registration will be closed!**
 > **Ensure that the `database-pwd` parameter is set; otherwise, you will not be able to login!**
 
@@ -179,18 +187,20 @@ The configuration file can be found in `config/config.json` and looks like the f
     "allow-private-lists":true
 }
 ```
+> [!TIP]
 > Consider changing the authentication pepper to a unique value per install. This value will be used in authentication hash security. Pepper must be at least 8 characters long and contain a mix of uppercase, lowercase letters, and at least one digit and one special character. Changing this to a custom value will increase the offline security of any compromised user's password hash due to the tool being open source.
 
 If we `git clone` the repository we can use the configuration file found in `/config/config.json` as a base.
 ![Screen capture of a terminal using vim to edit the configuration file.](/docs/images/install-6.png)
 
-Configure this file with the updated settings and then ensure that the `Dockerfile` is pointed at the correct configuration file:
+Configure this file with the updated settings, including the database username and password and then ensure that the `Dockerfile` is pointed at the correct configuration file:
 ```
 # Location of your config file
 ENV CONF_FILE=./config/config.json
 COPY ${CONF_FILE} /etc/config.json
 ```
 
+> [!IMPORTANT]
  > **Ensure you have updated the password for the database user and open-registration is enabled before building!**
 
 After editing the configuration file, ensure that the paths for the configuration file, as well as any other items like custom certificates, are correctly stated before building the image.
@@ -201,7 +211,7 @@ After editing the configuration file, ensure that the paths for the configuratio
 ### Build the Docker Image
 
 Next, we can build the image containing the server application and configuration.
-- Ensure you are in the same directory as the `Dockerfile`.
+- Ensure you are in the same directory as the `Dockerfile` or point it to the correct path.
 ```
 sudo docker build -t ohaserver .
 ```
@@ -223,6 +233,7 @@ There are two options for registering a new user:
 - The easiest way to register is by going to `https://URL/login` and use the form
 - The other way is to send a formatted request to `/api/register` with the client
 
+> [!IMPORTANT]
 > Ensure that the `open-registration` parameter is set otherwise registration will be closed.
 
 In the capture below, we can see using a browser to register a new user with a complex password (at least 12 characters long and contain a mix of uppercase, lowercase letters, and at least one digit and one special character).
@@ -231,6 +242,7 @@ In the capture below, we can see using a browser to register a new user with a c
 After this step you should be able to login and test most of the API endpoints.
 ![Screen capture of a terminal and a browser showing a successful login](/docs/images/install-10.png)
 
+> [!NOTE]
 > This will be the user you authenticate to the platform and API with! If using the `OpenHashAPI` client, ensure that the username and password field is updated.
 ---
 
@@ -242,6 +254,9 @@ sudo mysql
 use OpenHashAPI;
 UPDATE Users SET can_manage = 1 WHERE id = 0;
 ```
+
+> [!TIP]
+> Update the value of `id` with your created users. You can find the ID value with `SELECT * FROM Users;`
 
 ---
 
@@ -264,8 +279,15 @@ mysqldump --databases --single-transaction --quick OpenHashAPI > $date-oha.sql
 On Ubuntu systems, you may need to reconfigure the default authentication mechanism first:
 ```
 # STRONGLY suggest changing the password value
+# This command will allow for "mysql_secure_installation" to work by setting the root account with a native password
 sudo mysql --execute "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';" && sudo mysql_secure_installation
 
-# Revert auth back so sudo mysql works again
+# Revert auth back so sudo mysql works again and remove the native password
 sudo mysql -u root -p --execute "ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;"
 ```
+
+The commands above will allow the `root` account to authenticate with `sudo`. If you do not set this up, you may have to use `-u root -p` syntax instead:
+```
+sudo mysql -u root -p
+```
+

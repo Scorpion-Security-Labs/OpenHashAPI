@@ -21,6 +21,7 @@
 - [Are $HEX[...] Items Processed in All Features?](#are-hex-items-processed-in-all-features)
 - [Are Multibyte Items Processed?](#are-multibyte-items-processed)
 - [The Filter was Changed but Nothing Is Being Removed?](#the-filter-was-changed-but-nothing-is-being-removed)
+- [Why is the Database not Containerized?](#why-is-the-database-not-containerized)
 
 ---
 ## How Do I Install the Server?
@@ -153,3 +154,5 @@
 - Once items are reset, the self-validation feature will enumerate them and
   remove any that match the new filter.
 
+## Why is the Database not Containerized?
+- The database is not containerized to ensure the database persists beyond application restarts. Additonally, some users will use the system to house billions of records, this level of performance can benefit from less layers of virtualization.

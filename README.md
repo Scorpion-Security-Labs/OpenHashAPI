@@ -50,7 +50,7 @@ OpenHashAPI provides a secure method of communicating hashes over HTTPS and enab
 
 ## Usage & API:
 - The API is defined in `docs/API.md` and `docs/API.yml`
-- Detailed usage documentation can be found in `docs/USAGE.md`
+- Detailed usage documentation can be found in `docs/FAQ.md`
 - The server also supports browser interactive documentation at `/login`
 
 The following are defined API endpoints:
