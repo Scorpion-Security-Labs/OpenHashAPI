@@ -14,7 +14,7 @@ import (
 func TestValidateConfigFile(t *testing.T) {
 	config := Configuration{
 		DatabaseUser:                "testUser",
-		DatabasePwd:                 "testPassword",
+		DatabasePwd:                 "testPassword123!@#",
 		AuthenticationPepper:        "0H4St4ticP3pp3r",
 		DatabaseIdleConnections:     100,
 		ServerPort:                  8080,

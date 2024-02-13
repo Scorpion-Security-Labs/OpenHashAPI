@@ -32,8 +32,13 @@ func ValidateConfigFile(config Configuration) (Configuration, error) {
 		return config, fmt.Errorf("Invalid database user. Expected a string with at most 32 alphanumeric characters. Got: %s", config.DatabaseUser)
 	}
 	// Validate the database password
-	if len(config.DatabasePwd) < 12 || !regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*()_+]{12,}$`).MatchString(config.DatabasePwd) {
-		return config, fmt.Errorf("Invalid database password. Passwords must be at least 12 characters long and contain a mix of uppercase, lowercase letters, and at least one digit and one special character")
+	upper := regexp.MustCompile(`[A-Z]`)
+	lower := regexp.MustCompile(`[a-z]`)
+	number := regexp.MustCompile(`[0-9]`)
+	special := regexp.MustCompile(`[^a-zA-Z0-9\s]`)
+
+	if len(config.DatabasePwd) < 12 || !(upper.MatchString(config.DatabasePwd) && lower.MatchString(config.DatabasePwd) && special.MatchString(config.DatabasePwd) && number.MatchString(config.DatabasePwd)) {
+		return config, fmt.Errorf("Invalid password. Passwords must be at least 12 characters long and contain a mix of uppercase, lowercase letters, and at least one digit and one special character")
 	}
 	// Validate the authentication pepper
 	if len(config.AuthenticationPepper) < 8 || !regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*()_+]{12,}$`).MatchString(config.AuthenticationPepper) {

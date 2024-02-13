@@ -146,6 +146,7 @@
   </div>
 
   <h1> POST Requests</h1>
+
   <div class="container">
     <h2>POST <code>/api/login</code></h2>
     
@@ -157,6 +158,32 @@
       Query Params: <code>none</code>
       <br>
       Access Role: <code>canLogin</code> in user attributes
+      <br>
+    </div>
+
+    <div id="curl-command">curl -X POST \
+      ${baseURL}/api/login \
+      -H 'Content-Type: application/json' \
+      --data '{
+        "username": "username",
+        "password": "password"
+        }'
+    </div>
+  </div>
+
+<br>
+
+  <div class="container">
+    <h2>POST <code>/api/register</code></h2>
+    
+    <div class="link-wrapper">
+      Registers a new user to the database.
+      <br>
+      Authenticated: <code>false</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>open-registration</code> in server configuration 
       <br>
     </div>
 
@@ -255,7 +282,7 @@
             "canUpload": false,
             "canManage": false,
             "canViewPrivateLists": false,
-            "canEditPrivateLists": false"
+            "canEditPrivateLists": false
         }'
     </div>
   </div>

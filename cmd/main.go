@@ -103,6 +103,11 @@ func main() {
 	private.POST("/lists", middleware.CanEditPrivateMiddleware(serverConfig.AllowPrivateLists), api.EditListHandler)
 	private.POST("/lists/:listname", middleware.CanEditPrivateMiddleware(serverConfig.AllowPrivateLists), api.EditListHandler)
 
+	// REDIRECT ROUTE
+	ginServer.NoRoute(func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/login")
+	})
+
 	// SERVER START
 	ginServer.RunTLS(fmt.Sprintf(":%d", serverConfig.ServerPort), serverConfig.ServerTLSCertfilePath, serverConfig.ServerTLSKeyfilePath)
 }

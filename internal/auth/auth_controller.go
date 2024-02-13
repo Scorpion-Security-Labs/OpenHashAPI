@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"ohaserver/internal/config"
 	"ohaserver/internal/models"
+	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -44,8 +45,12 @@ func RegistrationHandler(c *gin.Context) {
 		return
 	}
 
-	if len(input.Password) < 12 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "passwords require atleast 12 characters."})
+	upper := regexp.MustCompile(`[A-Z]`)
+	lower := regexp.MustCompile(`[a-z]`)
+	number := regexp.MustCompile(`[0-9]`)
+	special := regexp.MustCompile(`[^a-zA-Z0-9\s]`)
+	if len(input.Password) < 12 || !(upper.MatchString(input.Password) && lower.MatchString(input.Password) && special.MatchString(input.Password) && number.MatchString(input.Password)) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "password must be at least 12 characters long and contain only letters, numbers, and the following special characters: !@#$%^&*()_+"})
 		return
 	}
 
@@ -111,7 +116,7 @@ func LoginHandler(c *gin.Context) {
 			return
 		} else if err.Error() == "User is not allowed to login" {
 			config.LogError("LoginHandler: User is not allowed to login", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "user is not allowed to login"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "user is not allowed to login"})
 			return
 		}
 		config.LogError("LoginHandler: Something went wrong", err)

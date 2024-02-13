@@ -36,7 +36,7 @@ func HealthHandler(c *gin.Context) {
 	serverConfig := config.ServerConfig
 	db, err := auth.MySQLAuthenticate()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "authentication failed."})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "authentication failed."})
 		return
 	}
 	defer db.Close()
@@ -97,7 +97,7 @@ func SearchHandler(c *gin.Context) {
 	var outarray []models.HashStruct
 	db, err := auth.MySQLAuthenticate()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "authentication failed."})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "authentication failed."})
 		return
 	}
 	defer db.Close()
@@ -167,7 +167,7 @@ func SubmitHashHandler(c *gin.Context) {
 	serverConfig := config.ServerConfig
 	db, err := auth.MySQLAuthenticate()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "authentication failed."})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "authentication failed."})
 		return
 	}
 	defer db.Close()
@@ -193,7 +193,7 @@ func SubmitHashHandler(c *gin.Context) {
 			newhashes, err = config.RehashUpload(hashes.HashPlain, "0")
 			if err != nil {
 				config.LogError("SubmitHashHandler: error rehashing hashes", err)
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
 		} else if hashes.Algorithm != "100" && serverConfig.RehashAlgorithm == 100 {
@@ -201,7 +201,7 @@ func SubmitHashHandler(c *gin.Context) {
 			newhashes, err = config.RehashUpload(hashes.HashPlain, "100")
 			if err != nil {
 				config.LogError("SubmitHashHandler: error rehashing hashes", err)
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
 		} else if hashes.Algorithm != "1000" && serverConfig.RehashAlgorithm == 1000 {
@@ -209,7 +209,7 @@ func SubmitHashHandler(c *gin.Context) {
 			newhashes, err = config.RehashUpload(hashes.HashPlain, "1000")
 			if err != nil {
 				config.LogError("SubmitHashHandler: error rehashing hashes", err)
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
 			}
 		} else {
@@ -392,7 +392,7 @@ func DownloadFileHandler(c *gin.Context) {
 
 	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "file not available for download"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "file not available for download"})
 		return
 	}
 	defer file.Close()
@@ -470,7 +470,7 @@ func DownloadFileHandler(c *gin.Context) {
 
 	if err := scanner.Err(); err != nil {
 		config.LogError("DownloadFileHandler: error reading file", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -581,7 +581,7 @@ func ViewListHandler(c *gin.Context) {
 		}
 
 		if err := scanner.Err(); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -708,7 +708,7 @@ func EditListHandler(c *gin.Context) {
 			if strings.Contains(line, ":") {
 				cipher, _, err := config.ParseHashAndPlaintext(line)
 				if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 					return
 				}
 				finalLines[cipher] = line
@@ -722,7 +722,7 @@ func EditListHandler(c *gin.Context) {
 			if strings.Contains(line, ":") {
 				cipher, _, err := config.ParseHashAndPlaintext(line)
 				if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 					return
 				}
 				finalLines[cipher] = line

@@ -13,4 +13,5 @@
   generated new every run unless the container was not started with `--rm`. If
   the `Dockerfile` was modified to use other secret material, ensure that
   material is rotated for all affected devices. Restore the back-end database
-  to prior versions to ensure no persistent accounts were created.
+  to prior versions to ensure no persistent accounts were created. Assume
+  hashes have been compromised and reset the authentication pepper.

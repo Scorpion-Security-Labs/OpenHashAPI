@@ -544,37 +544,37 @@ func UpdateUserPermissions(userID uint, permissionsJSON []byte) error {
 
 	userIDStr := fmt.Sprintf("%v", userID)
 	if models.ValidateIntInput(userIDStr) == false {
-		return errors.New("Missing userID field")
+		return errors.New("Missing or invalid userID field")
 	}
 
 	canLogin, ok := permissions["canLogin"]
-	if !ok {
-		return errors.New("Missing canLogin field")
+	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canLogin)) == false {
+		return errors.New("Missing or invalid canLogin field")
 	}
 
 	canSearch, ok := permissions["canSearch"]
-	if !ok {
-		return errors.New("Missing canSearch field")
+	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canSearch)) == false {
+		return errors.New("Missing or invalid canSearch field")
 	}
 
 	canUpload, ok := permissions["canUpload"]
-	if !ok {
-		return errors.New("Missing canUpload field")
+	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canUpload)) == false {
+		return errors.New("Missing or invalid canUpload field")
 	}
 
 	canManage, ok := permissions["canManage"]
-	if !ok {
-		return errors.New("Missing canManage field")
+	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canManage)) == false {
+		return errors.New("Missing or invalid canManage field")
 	}
 
 	canViewPrivate, ok := permissions["canViewPrivateLists"]
-	if !ok {
-		return errors.New("Missing canViewPrivateLists field")
+	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canViewPrivate)) == false {
+		return errors.New("Missing or invalid canViewPrivateLists field")
 	}
 
 	canEditPrivate, ok := permissions["canEditPrivateLists"]
-	if !ok {
-		return errors.New("Missing canEditPrivateLists field")
+	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canEditPrivate)) == false {
+		return errors.New("Missing or invalid canEditPrivateLists field")
 	}
 
 	_, err = db.Exec(`UPDATE Users SET can_login = ?, can_search = ?, can_upload = ?, can_manage = ?, can_view_private = ?, can_edit_private = ? WHERE id = ?`,
