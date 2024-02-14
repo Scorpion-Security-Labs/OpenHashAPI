@@ -409,7 +409,7 @@ func DownloadFileHandler(c *gin.Context) {
 
 			if prepends != "" {
 
-				prependRegex := `\^[a-zA-Z0-9!@#$%^&*()_+=.-] `
+				prependRegex := `\^[a-zA-Z0-9!@#$%^&*()_+=.-] |\^[a-zA-Z0-9!@#$%^&*()_+=.-]$`
 				if prependBool {
 					if !regexp.MustCompile(prependRegex).MatchString(scanner.Text()) {
 						continue
@@ -423,7 +423,7 @@ func DownloadFileHandler(c *gin.Context) {
 
 			if appends != "" {
 
-				appendRegex := `\$[a-zA-Z0-9!@#$%^&*()_+=.-] `
+				appendRegex := `\$[a-zA-Z0-9!@#$%^&*()_+=.-] |\$[a-zA-Z0-9!@#$%^&*()_+=.-]$`
 				if appendBool {
 					if !regexp.MustCompile(appendRegex).MatchString(scanner.Text()) {
 						continue
@@ -437,7 +437,7 @@ func DownloadFileHandler(c *gin.Context) {
 
 			if toggles != "" {
 
-				toggleRegex := `T[0-9A-Z] `
+				toggleRegex := `T[0-9A-Z] |T[0-9A-Z]$`
 				if toggleBool {
 					if !regexp.MustCompile(toggleRegex).MatchString(scanner.Text()) {
 						continue
@@ -457,13 +457,7 @@ func DownloadFileHandler(c *gin.Context) {
 
 			lineCount++
 
-		} else if contains == "" || strings.Contains(scanner.Text(), contains) {
-			lineCount++
-		} else if prepends != "" {
-			lineCount++
-		} else if appends != "" {
-			lineCount++
-		} else if toggles != "" {
+		} else if contains == "" || prepends != "" || appends != "" || toggles != "" || strings.Contains(scanner.Text(), contains) {
 			lineCount++
 		}
 	}
