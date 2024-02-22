@@ -57,7 +57,7 @@
     * `canEditPrivateLists`: Whether the user can edit private lists on the server.
 ### GET `/api/download/FILE/NUM`
 - Allows the download of files from the server.
-- FILE can be wordlist, mask, or rules
+- FILE can be wordlist, mask, or rules. NUM is the number of results to return.
 - Authenticated: `true`
 - Query Params: `offset` `contains`
 - Access Role: `none` 
