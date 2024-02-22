@@ -244,6 +244,24 @@ After this step you should be able to login and test most of the API endpoints.
 
 > [!NOTE]
 > This will be the user you authenticate to the platform and API with! If using the `OpenHashAPI` client, ensure that the username and password field is updated.
+
+Once this step is completed, the `OpenHashAPI` server should be ready to use, consider testing the upload portion by submitting the example hash to the database.
+```
+curl -X POST \
+      https://192.168.40.162:8080/api/found \
+      -H 'Authorization: Bearer THE_JWT_VALUE' \
+      -H 'Content-Type: application/json' \
+      --data '{
+        "algorithm": "0",
+        "hash-plain": [
+            "5f4dcc3b5aa765d61d8327deb882cf99:password"
+            ]
+        }'
+```
+
+> [!NOTE]
+> The API will be looking for an array of strings containing atleast one ":". Hashes should be in `HASH:PLAIN` or `HASH:SALT:PLAIN` and the `algorithm` should be an integer value reflecting the hash mode used.
+
 ---
 
 ### Assign Initial Permissions

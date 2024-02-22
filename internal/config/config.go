@@ -423,6 +423,9 @@ func ValidateDatabaseHashes(db *sql.DB, chunkSize int, numWorkers int, algo int)
 	go func() {
 		count := int64(0)
 		threshold := totalRows / 1000
+		if threshold < 1 {
+			threshold = 1
+		}
 		for result := range results {
 			if result.Err != nil {
 				message := fmt.Sprintf("Deleted %s:%s | %v", result.Hash, result.Plaintext, result.Err)
