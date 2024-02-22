@@ -143,8 +143,8 @@ func LoginHandler(c *gin.Context) {
 //	canSearch (bool): Whether the user can search
 //	canUpload (bool): Whether the user can upload
 //	canManage (bool): Whether the user can manage other users
-//	canViewPrivateLists (bool): Whether the user can view private lists
-//	canEditPrivateLists (bool): Whether the user can edit private lists
+//	canViewUserLists (bool): Whether the user can view user lists
+//	canEditUserLists (bool): Whether the user can edit user lists
 //
 // Args:
 //

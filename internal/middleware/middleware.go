@@ -206,20 +206,20 @@ func CanManageMiddleware() gin.HandlerFunc {
 	}
 }
 
-// CanListPrivateMiddleware controls access to list all private lists via the API
+// CanListUserListsMiddleware controls access to list all user lists via the API
 //
 // This middleware checks for authentication and then verifies the
 // authentication token claims for access
 //
 // Args:
 //
-// allowPrivateLists (bool): controls allowance of private list requests
+// allowUserLists (bool): controls allowance of user list requests
 //
 // Returns:
 // (gin.HandlerFunc): gin.Handler object
-func CanListPrivateMiddleware(allowPrivateLists bool) gin.HandlerFunc {
+func CanListUserListsMiddleware(allowUserLists bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !allowPrivateLists {
+		if !allowUserLists {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
@@ -228,7 +228,7 @@ func CanListPrivateMiddleware(allowPrivateLists bool) gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
-		canList, ok := claims["canViewPrivateLists"].(bool)
+		canList, ok := claims["canViewUserLists"].(bool)
 		if !ok || !canList {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
@@ -237,20 +237,20 @@ func CanListPrivateMiddleware(allowPrivateLists bool) gin.HandlerFunc {
 	}
 }
 
-// CanEditPrivateMiddleware controls access to edit private lists via the API
+// CanEditUserListsMiddleware controls access to edit user lists via the API
 //
 // This middleware checks for authentication and then verifies the
 // authentication token claims for access
 //
 // Args:
 //
-// allowPrivateLists (bool): controls allowance of private list requests
+// allowUserLists (bool): controls allowance of user list requests
 //
 // Returns:
 // (gin.HandlerFunc): gin.Handler object
-func CanEditPrivateMiddleware(allowPrivateLists bool) gin.HandlerFunc {
+func CanEditUserListsMiddleware(allowUserLists bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !allowPrivateLists {
+		if !allowUserLists {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
@@ -259,7 +259,7 @@ func CanEditPrivateMiddleware(allowPrivateLists bool) gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
-		canEdit, ok := claims["canEditPrivateLists"].(bool)
+		canEdit, ok := claims["canEditUserLists"].(bool)
 		if !ok || !canEdit {
 			c.AbortWithStatus(http.StatusForbidden)
 			return

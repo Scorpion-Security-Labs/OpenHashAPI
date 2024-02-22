@@ -37,7 +37,7 @@ package models
 //	GenerateWordlist: If the server should start a process to make a wordlist
 //	GenerateRules: If the server should start a process to make a rule list
 //	GenerateMasks: If the server should start a process to make a mask list
-//	AllowPrivateLists: If the server should allow private lists
+//	AllowUserLists: If the server should allow user lists
 type Configuration struct {
 	DatabaseUser                string `json:"database-user"`
 	DatabasePwd                 string `json:"database-pwd"`
@@ -61,7 +61,7 @@ type Configuration struct {
 	GenerateWordlist            bool   `json:"generate-wordlist"`
 	GenerateRules               bool   `json:"generate-rules"`
 	GenerateMasks               bool   `json:"generate-masks"`
-	AllowPrivateLists           bool   `json:"allow-private-lists"`
+	AllowUserLists              bool   `json:"allow-user-lists"`
 }
 
 // HashSearchStruct is a struct used for searching the database

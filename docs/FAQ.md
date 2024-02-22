@@ -57,8 +57,8 @@
     - `canSearch`
     - `canUpload`
     - `canManage`
-    - `canViewPrivateLists`
-    - `canEditPrivateLists`
+    - `canViewUserLists`
+    - `canEditUserLists`
 
 ## How Can I Upload Hashes?
 - Authenticated users are allowed to submit new hashes to the database.
@@ -68,7 +68,7 @@
 - If server administrators allow, files not
   affected by filtering or database can also be uploaded. These files are stored in the container's filesystem and can be updated with new findings.
 - The `/api/lists` and `/api/lists/LISTNAME` endpoints accept GET and POST
-  requests to work with private lists.
+  requests to work with user lists.
 
 ## How Can I Search Hashes?
 - Authenticated users can search the database for hashes or plaintext values.
@@ -81,7 +81,7 @@
 - `Users` contains each registered user's username, hash, and permissions matrix.
 - `Hashes` contains the algorithm, hash, and plaintext for each submitted hash.
 - Hashes are accepted as `HASH:PLAIN` or `HASH:SALT:PLAIN` values, and attempts are made to parse plaintext from hash values.
-- If private lists are allowed, these are stored on the container's filesystem and can be mounted to the host for persistence.
+- If user lists are allowed, these are stored on the container's filesystem and can be mounted to the host for persistence.
 - Within the container, files are stored within the `/var/www/OpenHashAPI` directory and contain the following:
     - `lists/`
     - `logs/`
@@ -115,7 +115,7 @@
 - This can be done with the `/api/download/FILE/NUM` endpoint.
 - `FILE` can be one of three values: wordlist, masks, and rules.
 - `NUM` must be a valid integer value, and the query will return that many rows.
-- If private lists are allowed, the `/api/lists/LISTNAME` endpoint can be used to retrieve content.
+- If user lists are allowed, the `/api/lists/LISTNAME` endpoint can be used to retrieve content.
 
 ## How are the Files Made?
 - Files are made asynchronously from the database records and made ready for download.

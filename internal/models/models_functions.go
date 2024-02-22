@@ -98,9 +98,9 @@ func ValidateConfigFile(config Configuration) (Configuration, error) {
 		return config, fmt.Errorf("Invalid number of self heal database chunks. Expected a value between 0 and 10000. Got: %d", config.ServerPort)
 	}
 
-	// Validate the allow private lists field
-	if reflect.TypeOf(config.AllowPrivateLists).Kind() != reflect.Bool {
-		return config, fmt.Errorf("Invalid allow private list value. Expected a boolean value. Got: %v", config.AllowPrivateLists)
+	// Validate the allow user lists field
+	if reflect.TypeOf(config.AllowUserLists).Kind() != reflect.Bool {
+		return config, fmt.Errorf("Invalid allow user list value. Expected a boolean value. Got: %v", config.AllowUserLists)
 	}
 
 	// Validate the path fields

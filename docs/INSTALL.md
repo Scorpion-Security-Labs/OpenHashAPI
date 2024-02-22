@@ -153,7 +153,7 @@ The server uses a JSON configuration file to set several variables used by the s
 * `GenerateWordlist`: If the server should start a process to make a wordlist.
 * `GenerateRules`: If the server should start a process to make a rule list.
 * `GenerateMasks`: If the server should start a process to make a mask list.
-* `AllowPrivateLists`: If the server should allow the creation and downloading of private lists.
+* `AllowUserLists`: If the server should allow the creation and downloading of user lists.
 
 > [!IMPORTANT]
 > **Ensure that the `open-registration` parameter is set; otherwise, registration will be closed!**
@@ -184,7 +184,7 @@ The configuration file can be found in `config/config.json` and looks like the f
     "generate-wordlist":true,
     "generate-rules":true,
     "generate-masks":true,
-    "allow-private-lists":true
+    "allow-user-lists":true
 }
 ```
 > [!TIP]

@@ -98,10 +98,10 @@ func main() {
 	private.POST("/manage", middleware.CanManageMiddleware(), auth.ManageUserHandler)
 
 	// PRIVATE LIST ROUTES
-	private.GET("/lists", middleware.CanListPrivateMiddleware(serverConfig.AllowPrivateLists), api.ViewListHandler)
-	private.GET("/lists/:listname", middleware.CanListPrivateMiddleware(serverConfig.AllowPrivateLists), api.ViewListHandler)
-	private.POST("/lists", middleware.CanEditPrivateMiddleware(serverConfig.AllowPrivateLists), api.EditListHandler)
-	private.POST("/lists/:listname", middleware.CanEditPrivateMiddleware(serverConfig.AllowPrivateLists), api.EditListHandler)
+	private.GET("/lists", middleware.CanListUserListsMiddleware(serverConfig.AllowUserLists), api.ViewListHandler)
+	private.GET("/lists/:listname", middleware.CanListUserListsMiddleware(serverConfig.AllowUserLists), api.ViewListHandler)
+	private.POST("/lists", middleware.CanEditUserListsMiddleware(serverConfig.AllowUserLists), api.EditListHandler)
+	private.POST("/lists/:listname", middleware.CanEditUserListsMiddleware(serverConfig.AllowUserLists), api.EditListHandler)
 
 	// REDIRECT ROUTE
 	ginServer.NoRoute(func(c *gin.Context) {

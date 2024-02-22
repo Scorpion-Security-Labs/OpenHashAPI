@@ -21,5 +21,5 @@
     "generate-wordlist":true,
     "generate-rules":true,
     "generate-masks":true,
-    "allow-private-lists":true
+    "allow-user-lists":true
 }

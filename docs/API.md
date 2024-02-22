@@ -53,8 +53,8 @@
     * `canSearch`: Whether the user can search the database.
     * `canUpload`: If the user can upload new material to the database.
     * `canManage`: Whether the user can manage other users' permissions.
-    * `canViewPrivateLists`: If the user can view private lists on the server.
-    * `canEditPrivateLists`: Whether the user can edit private lists on the server.
+    * `canViewUserLists`: If the user can view user lists on the server.
+    * `canEditUserLists`: Whether the user can edit user lists on the server.
 ### GET `/api/download/FILE/NUM`
 - Allows the download of files from the server.
 - FILE can be wordlist, mask, or rules. NUM is the number of results to return.
@@ -91,7 +91,7 @@
 - The `LISTNAME` parameter is the file to return contents of.
 - Authenticated: `true`
 - Query Params: `none`
-- Access Role: `canViewPrivateLists` in user attributes and `allow-private-lists` in server configuration
+- Access Role: `canViewUserLists` in user attributes and `allow-user-lists` in server configuration
 - Responses:
     * `200` OK
     * `Content-Type`: `text/plain`
@@ -103,7 +103,7 @@
 - The `LISTNAME` parameter will attempt to update that file with new items.
 - Authenticated: `true`
 - Query Params: `name`
-- Access Role: `canEditPrivateLists` in user attributes and `allow-private-lists` in server configuration
+- Access Role: `canEditUserLists` in user attributes and `allow-user-lists` in server configuration
 - Responses:
     * `200` OK
     * `Content-Type`: `text/plain`

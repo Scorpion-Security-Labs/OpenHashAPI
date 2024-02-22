@@ -15,3 +15,18 @@
   material is rotated for all affected devices. Restore the back-end database
   to prior versions to ensure no persistent accounts were created. Assume
   hashes have been compromised and reset the authentication pepper.
+
+### User Lists Permissions and Default File View/Edit Visibility
+- The ability to allow or deny user lists to be uploaded, edited, or viewed is
+  done with the `allow-user-lists` setting in `config.json` set on the
+  server.
+- The ability to restrict users to view lists is done with the
+  `canViewUserLists` user permission which is tied to the `can_view_private`
+  permission in the `Users` database table.
+- The ability to restrict users to edit lists is done with the
+  `canEditUserLists` user permission which is tied to the `can_edit_private`
+  permission in the `Users` database table.
+- By default, all users with these permissions will be able to see and edit the
+  same files. This means that by default, a user with these permission will be
+  able to see and edit **all** files respectively. There is no notion of
+  per-list restricted access within the application at this time. 

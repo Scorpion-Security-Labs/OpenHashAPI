@@ -51,18 +51,18 @@ type CredentialInput struct {
 //	CanSearch: Whether the user can search
 //	CanUpload: Whether the user can upload
 //	CanManage: Whether the user can manage other users
-//	CanViewPrivateLists: Whether the user can view and download private lists
-//	CanEditPrivateLists: Whether the user can edit and upload to private list
+//	CanViewUserLists: Whether the user can view and download user lists
+//	CanEditUserLists: Whether the user can edit and upload to user list
 type User struct {
-	ID                  uint   `json:"id"`
-	Username            string `json:"username"`
-	Password            string `json:"password"`
-	CanLogin            bool   `json:"can_login"`
-	CanSearch           bool   `json:"can_search"`
-	CanUpload           bool   `json:"can_upload"`
-	CanManage           bool   `json:"can_manage"`
-	CanViewPrivateLists bool   `json:"can_view_private_lists"`
-	CanEditPrivateLists bool   `json:"can_edit_private_lists"`
+	ID               uint   `json:"id"`
+	Username         string `json:"username"`
+	Password         string `json:"password"`
+	CanLogin         bool   `json:"can_login"`
+	CanSearch        bool   `json:"can_search"`
+	CanUpload        bool   `json:"can_upload"`
+	CanManage        bool   `json:"can_manage"`
+	CanViewUserLists bool   `json:"can_view_user_lists"`
+	CanEditUserLists bool   `json:"can_edit_user_lists"`
 }
 
 // MySQLAuthenticate authorizes a connection to the backend DB
@@ -115,14 +115,14 @@ func MySQLAuthenticate() (*sql.DB, error) {
 //	canSearch (bool): Whether the user can search
 //	canUpload (bool): Whether the user can upload
 //	canManage (bool): Whether the user can manage other users
-//	canViewPrivateLists (bool): Whether the user can view and download private lists
-//	canEditPrivateLists (bool): Whether the user can edit and upload to private list
+//	canViewUserLists (bool): Whether the user can view and download user lists
+//	canEditUserLists (bool): Whether the user can edit and upload to user list
 //
 // Returns:
 //
 //	tokenString (string): The created JWT token
 //	err (error): Error data
-func GenerateToken(userID uint, canLogin bool, canSearch bool, canUpload bool, canManage bool, canViewPrivateLists bool, canEditPrivateLists bool) (string, error) {
+func GenerateToken(userID uint, canLogin bool, canSearch bool, canUpload bool, canManage bool, canViewUserLists bool, canEditUserLists bool) (string, error) {
 
 	if !canLogin {
 		return "", errors.New("User is not allowed to login")
@@ -148,8 +148,8 @@ func GenerateToken(userID uint, canLogin bool, canSearch bool, canUpload bool, c
 	claims["canSearch"] = canSearch
 	claims["canUpload"] = canUpload
 	claims["canManage"] = canManage
-	claims["canViewPrivateLists"] = canViewPrivateLists
-	claims["canEditPrivateLists"] = canEditPrivateLists
+	claims["canViewUserLists"] = canViewUserLists
+	claims["canEditUserLists"] = canEditUserLists
 	claims["exp"] = time.Now().Add(time.Minute * time.Duration(tokenLifespan)).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
@@ -222,14 +222,14 @@ func ValidateTokenClaims(claims jwt.MapClaims) error {
 		return errors.New("Invalid canManage value")
 	}
 
-	_, ok = claims["canViewPrivateLists"].(bool)
+	_, ok = claims["canViewUserLists"].(bool)
 	if !ok {
-		return errors.New("Invalid canViewPrivateLists value")
+		return errors.New("Invalid canViewUserLists value")
 	}
 
-	_, ok = claims["canEditPrivateLists"].(bool)
+	_, ok = claims["canEditUserLists"].(bool)
 	if !ok {
-		return errors.New("Invalid canEditPrivateLists value")
+		return errors.New("Invalid canEditUserLists value")
 	}
 
 	return nil
@@ -411,7 +411,7 @@ func AuthenticationCheck(username string, password string) (string, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&u.ID, &u.Username, &u.Password, &u.CanLogin, &u.CanSearch, &u.CanUpload, &u.CanManage, &u.CanViewPrivateLists, &u.CanEditPrivateLists)
+		err = rows.Scan(&u.ID, &u.Username, &u.Password, &u.CanLogin, &u.CanSearch, &u.CanUpload, &u.CanManage, &u.CanViewUserLists, &u.CanEditUserLists)
 	}
 	err = rows.Err()
 
@@ -439,7 +439,7 @@ func AuthenticationCheck(username string, password string) (string, error) {
 		return "", errors.New("Invalid Credentials")
 	}
 
-	token, err := GenerateToken(u.ID, u.CanLogin, u.CanSearch, u.CanUpload, u.CanManage, u.CanViewPrivateLists, u.CanEditPrivateLists)
+	token, err := GenerateToken(u.ID, u.CanLogin, u.CanSearch, u.CanUpload, u.CanManage, u.CanViewUserLists, u.CanEditUserLists)
 
 	if err != nil {
 		return "", err
@@ -567,23 +567,23 @@ func UpdateUserPermissions(userID uint, permissionsJSON []byte) error {
 		return errors.New("Missing or invalid canManage field")
 	}
 
-	canViewPrivate, ok := permissions["canViewPrivateLists"]
-	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canViewPrivate)) == false {
-		return errors.New("Missing or invalid canViewPrivateLists field")
+	canViewPrivateLists, ok := permissions["canViewUserLists"]
+	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canViewPrivateLists)) == false {
+		return errors.New("Missing or invalid canViewUserLists field")
 	}
 
-	canEditPrivate, ok := permissions["canEditPrivateLists"]
-	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canEditPrivate)) == false {
-		return errors.New("Missing or invalid canEditPrivateLists field")
+	canEditPrivateLists, ok := permissions["canEditUserLists"]
+	if !ok || models.ValidateBoolInput(fmt.Sprintf("%v", canEditPrivateLists)) == false {
+		return errors.New("Missing or invalid canEditUserLists field")
 	}
 
 	_, err = db.Exec(`UPDATE Users SET can_login = ?, can_search = ?, can_upload = ?, can_manage = ?, can_view_private = ?, can_edit_private = ? WHERE id = ?`,
-		canLogin, canSearch, canUpload, canManage, canViewPrivate, canEditPrivate, userID)
+		canLogin, canSearch, canUpload, canManage, canViewPrivateLists, canEditPrivateLists, userID)
 	if err != nil {
 		return err
 	}
 
 	// Log the event
-	config.LogError(fmt.Sprintf("UpdateUserPermissions: User %d permissions have been updated", userID), fmt.Errorf("can_login %s, can_search %s, can_upload %s, can_manage:%s, can_view_private:%s, can_edit_private:%s", canLogin, canSearch, canUpload, canManage, canViewPrivate, canEditPrivate))
+	config.LogError(fmt.Sprintf("UpdateUserPermissions: User %d permissions have been updated", userID), fmt.Errorf("can_login %s, can_search %s, can_upload %s, can_manage:%s, can_view_private:%s, can_edit_private:%s", canLogin, canSearch, canUpload, canManage, canViewPrivateLists, canEditPrivateLists))
 	return nil
 }

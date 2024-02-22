@@ -68,14 +68,14 @@ func TestValidateTokenClaims(t *testing.T) {
 
 	// Test that ValidateTokenClaims returns nil for valid claims
 	claims = jwt.MapClaims{
-		"authorized":          true,
-		"exp":                 time.Now().Add(time.Hour).Unix(),
-		"canLogin":            true,
-		"canSearch":           true,
-		"canUpload":           true,
-		"canManage":           true,
-		"canViewPrivateLists": true,
-		"canEditPrivateLists": true,
+		"authorized":       true,
+		"exp":              time.Now().Add(time.Hour).Unix(),
+		"canLogin":         true,
+		"canSearch":        true,
+		"canUpload":        true,
+		"canManage":        true,
+		"canViewUserLists": true,
+		"canEditUserLists": true,
 	}
 	err = ValidateTokenClaims(claims)
 	if err != nil {
