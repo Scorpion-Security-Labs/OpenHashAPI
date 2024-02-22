@@ -34,6 +34,7 @@
 - Request Body:
     * `algorithm`: The algorithm used to generate the hash.
     * `hash-plain`: An array of hashes and plain text values.
+    * Values should be submitted as `HASH:PLAIN` or `HASH:SALT:PLAIN`
 ### POST `/api/search`
 - Allows searching the database by either `hash` or `plain` values.
 - Authenticated: `true`
