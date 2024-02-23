@@ -49,7 +49,7 @@ func RegistrationHandler(c *gin.Context) {
 	lower := regexp.MustCompile(`[a-z]`)
 	number := regexp.MustCompile(`[0-9]`)
 	special := regexp.MustCompile(`[^a-zA-Z0-9\s]`)
-	if len(input.Password) < 12 || !(upper.MatchString(input.Password) && lower.MatchString(input.Password) && special.MatchString(input.Password) && number.MatchString(input.Password)) {
+	if len(input.Password) < 12 || !(upper.MatchString(input.Password) && lower.MatchString(input.Password) && special.MatchString(input.Password) && number.MatchString(input.Password)) || !regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*()_+=. -]*$`).MatchString(input.Password) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "password must be at least 12 characters long and contain only letters, numbers, and the following special characters: !@#$%^&*()_+"})
 		return
 	}
