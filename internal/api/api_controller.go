@@ -4,6 +4,7 @@ package api
 
 import (
 	"bufio"
+	"database/sql"
 	"fmt"
 	"io"
 	"net/http"
@@ -127,18 +128,17 @@ func SearchHandler(c *gin.Context) {
 	}
 
 	// Build query based on search parameters
-	var query string
+	var stmt *sql.Stmt
 	if searchHashesBool && searchPlaintextsBool {
-		query = "SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ") OR plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
+		stmt, err = db.Prepare("SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ") OR plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")")
 	} else if searchHashesBool {
-		query = "SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
+		stmt, err = db.Prepare("SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")")
 	} else if searchPlaintextsBool {
-		query = "SELECT * FROM Hashes WHERE plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
+		stmt, err = db.Prepare("SELECT * FROM Hashes WHERE plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")")
 	} else {
-		query = "SELECT * FROM Hashes WHERE plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
+		stmt, err = db.Prepare("SELECT * FROM Hashes WHERE plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")")
 	}
 
-	stmt, err := db.Prepare(query)
 	if err != nil {
 		config.LogError("SearchHandler: error preparing statement", err)
 		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error preparing statement", Context: "SearchHandler"}
@@ -147,11 +147,22 @@ func SearchHandler(c *gin.Context) {
 	}
 	defer stmt.Close()
 
-	args := make([]interface{}, len(hashes.Data)*2)
-	for i, v := range hashes.Data {
-		args[i] = v
-		args[i+len(hashes.Data)] = v
+	var size int
+	if searchHashesBool && searchPlaintextsBool {
+		size = len(hashes.Data) * 2
+	} else {
+		size = len(hashes.Data)
 	}
+	args := make([]interface{}, size)
+	for i, v := range hashes.Data {
+		if searchHashesBool && searchPlaintextsBool {
+			args[i] = v
+			args[i+len(hashes.Data)] = v
+		} else {
+			args[i] = v
+		}
+	}
+
 	rows, err := stmt.Query(args...)
 	if err != nil {
 		config.LogError("SearchHandler: error querying database", err)
