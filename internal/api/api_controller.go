@@ -694,33 +694,45 @@ func EditListHandler(c *gin.Context) {
 		existingLines := strings.Split(string(existingData), "\n")
 		newLines := strings.Split(newData, "\n")
 
-		// Create a map to hold the final lines
+		// Create a map to hold the final lines and lefts
 		finalLines := make(map[string]string)
+		leftLines := make(map[string]string)
 
 		// Add existing lines to the map
 		for _, line := range existingLines {
-			if strings.Contains(line, ":") {
-				cipher, _, err := config.ParseHashAndPlaintext(line)
+			if strings.Contains(line, ":") && line != "" {
+				cipher, plain, err := config.ParseHashAndPlaintext(line)
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 					return
 				}
-				finalLines[cipher] = line
+				finalLines[cipher] = fmt.Sprintf("%s:%s", cipher, plain)
 			} else {
-				finalLines[line] = line
+				leftLines[line] = line
 			}
 		}
 
 		// Add new lines to the map
 		for _, line := range newLines {
-			if strings.Contains(line, ":") {
-				cipher, _, err := config.ParseHashAndPlaintext(line)
+			if strings.Contains(line, ":") && line != "" {
+				cipher, plain, err := config.ParseHashAndPlaintext(line)
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 					return
 				}
-				finalLines[cipher] = line
+
+				// Check if the cipher already exists in the map if not ignore
+				if _, ok := leftLines[cipher]; ok {
+					finalLines[cipher] = fmt.Sprintf("%s:%s", cipher, plain)
+					delete(leftLines, cipher)
+				}
+
 			}
+		}
+
+		// Add the left lines to the final lines
+		for _, line := range leftLines {
+			finalLines[line] = line
 		}
 
 		// Convert the map back to a slice
