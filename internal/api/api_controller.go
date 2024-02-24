@@ -36,7 +36,8 @@ func HealthHandler(c *gin.Context) {
 	serverConfig := config.ServerConfig
 	db, err := auth.MySQLAuthenticate()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "authentication failed."})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Database authentication failed", Context: "HealthHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 	defer db.Close()
@@ -97,20 +98,23 @@ func SearchHandler(c *gin.Context) {
 	var outarray []models.HashStruct
 	db, err := auth.MySQLAuthenticate()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "authentication failed."})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Database authentication failed", Context: "SearchHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 	defer db.Close()
 
 	if err := c.BindJSON(&hashes); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error binding JSON", Context: "SearchHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
 	stmt, err := db.Prepare("SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ") OR plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")")
 	if err != nil {
 		config.LogError("SearchHandler: error preparing statement", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error preparing statement", Context: "SearchHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 	defer stmt.Close()
@@ -123,7 +127,8 @@ func SearchHandler(c *gin.Context) {
 	rows, err := stmt.Query(args...)
 	if err != nil {
 		config.LogError("SearchHandler: error querying database", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error querying database", Context: "SearchHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 	defer rows.Close()
@@ -132,7 +137,8 @@ func SearchHandler(c *gin.Context) {
 		err = rows.Scan(&hash.Algorithm, &hash.Hash, &hash.Plaintext, &hash.Validated)
 		if err != nil {
 			config.LogError("SearchHandler: error scanning rows", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error scanning rows", Context: "SearchHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 		outarray = append(outarray, hash)
@@ -167,19 +173,22 @@ func SubmitHashHandler(c *gin.Context) {
 	serverConfig := config.ServerConfig
 	db, err := auth.MySQLAuthenticate()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "authentication failed."})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Database authentication failed", Context: "SubmitHashHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 	defer db.Close()
 
 	if err := c.BindJSON(&hashes); err != nil {
 		config.LogError("SubmitHashHandler: error binding JSON", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error binding JSON", Context: "SubmitHashHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
 	if models.ValidateIntInput(hashes.Algorithm) == false {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid algorithm selected"})
+		customErr := models.ErrorStruct{Error: "Invalid algorithm selected", Message: "Invalid algorithm selected", Context: "SubmitHashHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
@@ -193,7 +202,8 @@ func SubmitHashHandler(c *gin.Context) {
 			newhashes, err = config.RehashUpload(hashes.HashPlain, "0")
 			if err != nil {
 				config.LogError("SubmitHashHandler: error rehashing hashes", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				customErr := models.ErrorStruct{Error: err.Error(), Message: "Error rehashing hashes", Context: "SubmitHashHandler"}
+				c.JSON(http.StatusInternalServerError, customErr)
 				return
 			}
 		} else if hashes.Algorithm != "100" && serverConfig.RehashAlgorithm == 100 {
@@ -201,7 +211,8 @@ func SubmitHashHandler(c *gin.Context) {
 			newhashes, err = config.RehashUpload(hashes.HashPlain, "100")
 			if err != nil {
 				config.LogError("SubmitHashHandler: error rehashing hashes", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				customErr := models.ErrorStruct{Error: err.Error(), Message: "Error rehashing hashes", Context: "SubmitHashHandler"}
+				c.JSON(http.StatusInternalServerError, customErr)
 				return
 			}
 		} else if hashes.Algorithm != "1000" && serverConfig.RehashAlgorithm == 1000 {
@@ -209,7 +220,8 @@ func SubmitHashHandler(c *gin.Context) {
 			newhashes, err = config.RehashUpload(hashes.HashPlain, "1000")
 			if err != nil {
 				config.LogError("SubmitHashHandler: error rehashing hashes", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				customErr := models.ErrorStruct{Error: err.Error(), Message: "Error rehashing hashes", Context: "SubmitHashHandler"}
+				c.JSON(http.StatusInternalServerError, customErr)
 				return
 			}
 		} else {
@@ -252,7 +264,8 @@ func SubmitHashHandler(c *gin.Context) {
 	}
 
 	if len(newhashes) <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("No valid hashes received: %s", newhashes)})
+		customErr := models.ErrorStruct{Error: "No valid hashes received", Message: "No valid hashes received. Please check the filter if enabled.", Context: "SubmitHashHandler"}
+		c.JSON(http.StatusOK, customErr)
 		return
 	}
 
@@ -286,7 +299,8 @@ func SubmitHashHandler(c *gin.Context) {
 		statement, err := db.Prepare(str)
 		if err != nil {
 			config.LogError("SubmitHashHandler: error preparing statement", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error preparing statement", Context: "SubmitHashHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 		defer statement.Close()
@@ -294,14 +308,16 @@ func SubmitHashHandler(c *gin.Context) {
 		result, err := statement.Exec(batch...)
 		if err != nil {
 			config.LogError("SubmitHashHandler: error executing statement", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error executing statement", Context: "SubmitHashHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 
 		rowsAffected, err := result.RowsAffected()
 		if err != nil {
 			config.LogError("SubmitHashHandler: error getting rows affected", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error getting rows affected", Context: "SubmitHashHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 
@@ -358,7 +374,8 @@ func DownloadFileHandler(c *gin.Context) {
 	}
 
 	if !regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*()_+=. -]*$`).MatchString(contains) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid value provided for contains"})
+		customErr := models.ErrorStruct{Error: "Invalid value provided for contains", Message: fmt.Sprintf("Invalid value provided for contains: %q", contains), Context: "DownloadFileHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
@@ -369,7 +386,8 @@ func DownloadFileHandler(c *gin.Context) {
 	filename := c.Param("filename")
 
 	if filename != "wordlist" && filename != "rules" && filename != "masks" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid filename requested"})
+		customErr := models.ErrorStruct{Error: "Invalid value provided for filename", Message: fmt.Sprintf("Invalid value provided for filename: %q", filename), Context: "DownloadFileHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	} else if filename == "wordlist" {
 		filename = "/var/www/OpenHashAPI/wordlist.txt"
@@ -380,19 +398,22 @@ func DownloadFileHandler(c *gin.Context) {
 	}
 
 	if models.ValidateIntInput(n) == false {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid number requested"})
+		customErr := models.ErrorStruct{Error: "Invalid value provided for n", Message: fmt.Sprintf("Invalid value provided for number of entries: %q", n), Context: "DownloadFileHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
 	lines, err := strconv.Atoi(n)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error converting number of entries to integer", Context: "DownloadFileHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
 	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "file not available for download"})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error opening file", Context: "DownloadFileHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 	defer file.Close()
@@ -464,7 +485,8 @@ func DownloadFileHandler(c *gin.Context) {
 
 	if err := scanner.Err(); err != nil {
 		config.LogError("DownloadFileHandler: error reading file", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error reading file", Context: "DownloadFileHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 
@@ -522,11 +544,8 @@ func StatusHandler(c *gin.Context) {
 func ViewListHandler(c *gin.Context) {
 	listName := c.Param("listname")
 	if !regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*()_+=.-]*$`).MatchString(listName) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Invalid value provided for listName",
-			"error":   "invalid value provided for listName",
-		})
+		customErr := models.ErrorStruct{Error: "Invalid value provided for listName", Message: fmt.Sprintf("Invalid value provided for listName: %q", listName), Context: "ViewListHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
@@ -549,11 +568,8 @@ func ViewListHandler(c *gin.Context) {
 			return nil
 		})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status":  "error",
-				"message": "Error walking the path",
-				"error":   err.Error(),
-			})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error walking the path", Context: "ViewListHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
@@ -563,7 +579,8 @@ func ViewListHandler(c *gin.Context) {
 		// return the file contents of /var/www/OpenHashAPI/lists/listName
 		file, err := os.Open(filepath.Clean(fmt.Sprintf("%s/%s.%s", "/var/www/OpenHashAPI/lists", listName, "txt")))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "file not available"})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error opening file", Context: "ViewListHandler"}
+			c.JSON(http.StatusBadRequest, customErr)
 			return
 		}
 		defer file.Close()
@@ -575,7 +592,8 @@ func ViewListHandler(c *gin.Context) {
 		}
 
 		if err := scanner.Err(); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error reading file", Context: "ViewListHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 
@@ -603,7 +621,8 @@ func EditListHandler(c *gin.Context) {
 	userInputListName := c.Query("name")
 
 	if !regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*()_+=.-]*$`).MatchString(listName) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid value provided for listName"})
+		customErr := models.ErrorStruct{Error: "Invalid value provided for listName", Message: fmt.Sprintf("Invalid value provided for listName: %q", listName), Context: "EditListHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
@@ -611,22 +630,16 @@ func EditListHandler(c *gin.Context) {
 		body := c.Request.Body
 		data, err := io.ReadAll(body)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"status":  "error",
-				"message": "Bad request",
-				"error":   err.Error(),
-			})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error reading request body", Context: "EditListHandler"}
+			c.JSON(http.StatusBadRequest, customErr)
 			return
 		}
 
 		// Use a unique ID for the filename
 		uniqueID, err := config.GenerateInsecureUniqueID()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status":  "error",
-				"message": "Internal server error",
-				"error":   err.Error(),
-			})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error generating unique ID", Context: "EditListHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 
@@ -634,11 +647,8 @@ func EditListHandler(c *gin.Context) {
 		// If so, use that as the filename instead of the unique ID
 		if userInputListName != "" {
 			if models.ValidateUsernameInput(userInputListName) == false {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"status":  "error",
-					"message": "Invalid value provided for name",
-					"error":   "invalid value provided for name",
-				})
+				customErr := models.ErrorStruct{Error: "Invalid value provided for name", Message: fmt.Sprintf("Invalid value provided for name: %q", userInputListName), Context: "EditListHandler"}
+				c.JSON(http.StatusBadRequest, customErr)
 				return
 			}
 			uniqueID = userInputListName
@@ -646,7 +656,8 @@ func EditListHandler(c *gin.Context) {
 
 		// Check if the file already exists
 		if _, err := os.Stat(fmt.Sprintf("%s/%s.%s", "/var/www/OpenHashAPI/lists", uniqueID, "txt")); err == nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "file already exists"})
+			customErr := models.ErrorStruct{Error: "File already exists", Message: fmt.Sprintf("File already exists: %q", uniqueID), Context: "EditListHandler"}
+			c.JSON(http.StatusBadRequest, customErr)
 			return
 		}
 
@@ -654,11 +665,8 @@ func EditListHandler(c *gin.Context) {
 		filename := fmt.Sprintf("%s/%s.%s", "/var/www/OpenHashAPI/lists", uniqueID, "txt")
 		err = os.WriteFile(filename, data, 0664)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status":  "error",
-				"message": "Internal server error",
-				"error":   err.Error(),
-			})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error writing file", Context: "EditListHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 
@@ -671,21 +679,24 @@ func EditListHandler(c *gin.Context) {
 		// non-matching hashes are ignored
 		// WARNING: no validation is done on the algorithmic values of the HASH:PLAIN
 		if listName == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "missing listname parameter"})
+			customErr := models.ErrorStruct{Error: "Missing listname parameter", Message: "Missing listname parameter", Context: "EditListHandler"}
+			c.JSON(http.StatusBadRequest, customErr)
 			return
 		}
 
 		body := c.Request.Body
 		data, err := io.ReadAll(body)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error reading request body", Context: "EditListHandler"}
+			c.JSON(http.StatusBadRequest, customErr)
 			return
 		}
 
 		// Read the existing file
 		existingData, err := os.ReadFile(fmt.Sprintf("%s/%s.%s", "/var/www/OpenHashAPI/lists", listName, "txt"))
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error reading existing file", Context: "EditListHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 
@@ -717,7 +728,8 @@ func EditListHandler(c *gin.Context) {
 			if strings.Contains(line, ":") && line != "" {
 				cipher, plain, err := config.ParseHashAndPlaintext(line)
 				if err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+					customErr := models.ErrorStruct{Error: err.Error(), Message: "Error parsing hash and plaintext", Context: "EditListHandler"}
+					c.JSON(http.StatusInternalServerError, customErr)
 					return
 				}
 
@@ -744,7 +756,8 @@ func EditListHandler(c *gin.Context) {
 		// Write the updated data back to the file
 		err = os.WriteFile(fmt.Sprintf("%s/%s.%s", "/var/www/OpenHashAPI/lists", listName, "txt"), []byte(strings.Join(updatedLines, "\n")), 0664)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			customErr := models.ErrorStruct{Error: err.Error(), Message: "Error writing file", Context: "EditListHandler"}
+			c.JSON(http.StatusInternalServerError, customErr)
 			return
 		}
 

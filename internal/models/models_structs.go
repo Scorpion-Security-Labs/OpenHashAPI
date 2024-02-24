@@ -98,3 +98,16 @@ type HashStruct struct {
 	Plaintext string `json:"plaintext"`
 	Validated string `json:"validated"`
 }
+
+// ErrorStruct is a struct used to hold error data
+//
+// The struct has the following fields:
+// 	Error: The error message
+// 	Message: The message to display
+// 	Context: The context of the error
+//
+type ErrorStruct struct {
+	Error   string `json:"error"`
+	Message string `json:"message"`
+	Context string `json:"context"`
+}

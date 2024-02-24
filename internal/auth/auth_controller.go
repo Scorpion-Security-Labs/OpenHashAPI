@@ -41,7 +41,8 @@ func RegistrationHandler(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		config.LogError("RegistrationHandler: Invalid JSON provided", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Invalid JSON provided", Context: "RegistrationHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
@@ -50,21 +51,23 @@ func RegistrationHandler(c *gin.Context) {
 	number := regexp.MustCompile(`[0-9]`)
 	special := regexp.MustCompile(`[^a-zA-Z0-9\s]`)
 	if len(input.Password) < 12 || !(upper.MatchString(input.Password) && lower.MatchString(input.Password) && special.MatchString(input.Password) && number.MatchString(input.Password)) || !regexp.MustCompile(`^[a-zA-Z0-9!@#$%^&*()_+=. -]*$`).MatchString(input.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "password must be at least 12 characters long and contain only letters, numbers, and the following special characters: !@#$%^&*()_+"})
+		customErr := models.ErrorStruct{Error: "password must be at least 12 characters long and contain only letters, numbers, and the following special characters: !@#$%^&*()_+", Message: "Invalid password provided", Context: "RegistrationHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
 	input.Username = html.EscapeString(strings.TrimSpace(input.Username))
 
 	if models.ValidateUsernameInput(input.Username) == false {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "username contains invalid characters."})
+		customErr := models.ErrorStruct{Error: "username contains invalid characters", Message: "Invalid username provided", Context: "RegistrationHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
 	err := RegisterNewUser(input.Username, input.Password)
 	if err != nil {
-		config.LogError("RegistrationHandler: Failed to register new user", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Failed to register new user", Context: "RegistrationHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
@@ -94,7 +97,8 @@ func LoginHandler(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		config.LogError("LoginHandler: Invalid JSON provided", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Invalid JSON provided", Context: "LoginHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
@@ -108,19 +112,23 @@ func LoginHandler(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			config.LogError("LoginHandler: Invalid username or password", err)
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid username or password"})
+			customErr := models.ErrorStruct{Error: "invalid username or password", Message: "Invalid username or password", Context: "LoginHandler"}
+			c.JSON(http.StatusBadRequest, customErr)
 			return
 		} else if err == bcrypt.ErrMismatchedHashAndPassword {
 			config.LogError("LoginHandler: Invalid username or password", err)
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid username or password"})
+			customErr := models.ErrorStruct{Error: "invalid username or password", Message: "Invalid username or password", Context: "LoginHandler"}
+			c.JSON(http.StatusBadRequest, customErr)
 			return
 		} else if err.Error() == "User is not allowed to login" {
 			config.LogError("LoginHandler: User is not allowed to login", err)
-			c.JSON(http.StatusForbidden, gin.H{"error": "user is not allowed to login"})
+			customErr := models.ErrorStruct{Error: "user is not allowed to login", Message: "User is not allowed to login", Context: "LoginHandler"}
+			c.JSON(http.StatusForbidden, customErr)
 			return
 		}
 		config.LogError("LoginHandler: Something went wrong", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Something went wrong", Context: "LoginHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 
@@ -157,7 +165,8 @@ func ManageUserHandler(c *gin.Context) {
 	permissionsJSON, err := c.GetRawData()
 	if err != nil {
 		config.LogError("ManageUserHandler: Invalid JSON provided", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON provided"})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Invalid JSON provided", Context: "ManageUserHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
@@ -165,21 +174,24 @@ func ManageUserHandler(c *gin.Context) {
 	err = json.Unmarshal(permissionsJSON, &permissions)
 	if err != nil {
 		config.LogError("ManageUserHandler: Invalid JSON provided", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid JSON provided"})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Invalid JSON provided", Context: "ManageUserHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
 	userID, ok := permissions["userID"].(float64)
 	if !ok {
 		config.LogError("ManageUserHandler: Invalid userID value", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid userID value"})
+		customErr := models.ErrorStruct{Error: "invalid userID value", Message: "Invalid userID value", Context: "ManageUserHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
 		return
 	}
 
 	err = UpdateUserPermissions(uint(userID), permissionsJSON)
 	if err != nil {
 		config.LogError("ManageUserHandler: Failed to update user permissions", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update user permissions"})
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Failed to update user permissions", Context: "ManageUserHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
 		return
 	}
 
