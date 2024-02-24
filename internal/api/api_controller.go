@@ -134,6 +134,8 @@ func SearchHandler(c *gin.Context) {
 		query = "SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
 	} else if searchPlaintextsBool {
 		query = "SELECT * FROM Hashes WHERE plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
+	} else {
+		query = "SELECT * FROM Hashes WHERE plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
 	}
 
 	stmt, err := db.Prepare(query)
