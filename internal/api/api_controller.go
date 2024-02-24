@@ -81,6 +81,9 @@ func HealthHandler(c *gin.Context) {
 // The endpoint expects an authorized POST request with a JSON body and returns
 // any found HASH and/or PLAINS from the database that match
 //
+// The endpoint also accepts query parameters for hash and plaintext to search
+// for specific values
+//
 // The expected JSON object has a single property, data:
 //
 //	data (string): An array of strings with either HASH or PLAIN values
@@ -93,9 +96,22 @@ func HealthHandler(c *gin.Context) {
 //
 //	None
 func SearchHandler(c *gin.Context) {
+	searchHashes := c.Query("hash")
+	searchPlaintexts := c.Query("plaintext")
+	var searchHashesBool bool
+	var searchPlaintextsBool bool
 	var hashes models.HashSearchStruct
 	var hash models.HashStruct
 	var outarray []models.HashStruct
+
+	if models.ValidateBoolInput(searchHashes) == true {
+		searchHashesBool = true
+	}
+
+	if models.ValidateBoolInput(searchPlaintexts) == true {
+		searchPlaintextsBool = true
+	}
+
 	db, err := auth.MySQLAuthenticate()
 	if err != nil {
 		customErr := models.ErrorStruct{Error: err.Error(), Message: "Database authentication failed", Context: "SearchHandler"}
@@ -110,7 +126,17 @@ func SearchHandler(c *gin.Context) {
 		return
 	}
 
-	stmt, err := db.Prepare("SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ") OR plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")")
+	// Build query based on search parameters
+	var query string
+	if searchHashesBool && searchPlaintextsBool {
+		query = "SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ") OR plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
+	} else if searchHashesBool {
+		query = "SELECT * FROM Hashes WHERE hash IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
+	} else if searchPlaintextsBool {
+		query = "SELECT * FROM Hashes WHERE plaintext IN (?" + strings.Repeat(",?", len(hashes.Data)-1) + ")"
+	}
+
+	stmt, err := db.Prepare(query)
 	if err != nil {
 		config.LogError("SearchHandler: error preparing statement", err)
 		customErr := models.ErrorStruct{Error: err.Error(), Message: "Error preparing statement", Context: "SearchHandler"}

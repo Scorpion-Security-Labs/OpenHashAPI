@@ -39,8 +39,12 @@
 ### POST `/api/search`
 - Allows searching the database by either `hash` or `plain` values.
 - Authenticated: `true`
-- Query Params: `none`
+- Query Params: `hash` `plaintext`
 - Access Role: `canSearch` in user attributes 
+- Query String Parameters:
+    * `hash`: The hash to search for.
+    * `plaintext`: The plaintext value to search for.
+    * Both query string parameters can be used at once and expect boolean values.
 - Request Body:
     * `data`: An array of hashes or plain text values to search for.
 ### POST `/api/manage`

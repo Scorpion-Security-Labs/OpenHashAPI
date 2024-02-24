@@ -235,12 +235,21 @@
     <h2>POST <code>/api/search</code></h2>
     
     <div class="link-wrapper">
-      Allows searching the database by either <code>hash</code> or <code>plain</code> values.
+      Allows searching the database by either <code>hash</code> or
+      <code>plain</code> values. Both query strings can be used at the same time.
       <br>
       Authenticated: <code>true</code>
       <br>
-      Query Params: <code>none</code>
+      Query Params: <code>hash</code> <code>plaintext</code>
       <br>
+      <ul>
+          <li>
+              <code>hash</code> will search the database by hash
+          </li>
+          <li>
+              <code>plaintext</code> will search the database by plaintexti
+          </li>
+      </ul>   
       Access Role: <code>canSearch</code> in user attributes
       <br>
     </div>
