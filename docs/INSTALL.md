@@ -205,7 +205,7 @@ COPY ${CONF_FILE} /etc/config.json
 ```
 
 > [!IMPORTANT]
- > **Ensure you have updated the password for the database user and open-registration is enabled before building!**
+> **Ensure you have updated the password for the database user and open-registration is enabled before building!**
 
 After editing the configuration file, ensure that the paths for the configuration file, as well as any other items like custom certificates, are correctly stated before building the image.
 
