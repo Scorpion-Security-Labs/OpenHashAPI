@@ -40,7 +40,9 @@ RUN addgroup --gid 10001 --system nonroot \
     apk update; apk add --no-cache tini bind-tools; \
     mkdir -p /var/www/OpenHashAPI && chown nonroot:nonroot /var/www/OpenHashAPI \
     && mkdir -p /var/www/OpenHashAPI/logs && chown nonroot:nonroot /var/www/OpenHashAPI/logs \
-    && mkdir -p /var/www/OpenHashAPI/lists && chown nonroot:nonroot /var/www/OpenHashAPI/lists 
+    && mkdir -p /var/www/OpenHashAPI/lists && chown nonroot:nonroot /var/www/OpenHashAPI/lists \
+    && chown nonroot:nonroot /var/www/OpenHashAPI/static && chown nonroot:nonroot /var/www/OpenHashAPI/static/* \
+    && chown nonroot:nonroot /var/www/OpenHashAPI/templates && chown nonroot:nonroot /var/www/OpenHashAPI/templates/*;
 
 # Copy app over and set entrypoint
 COPY --from=build-env /src/app/cmd/cmd /sbin/ohaserver

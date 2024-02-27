@@ -323,11 +323,10 @@ func RehashUpload(hashes []string, algo string) ([]interface{}, error) {
 //
 //	None
 func ValidateDatabaseHashes(db *sql.DB, chunkSize int, numWorkers int, algo int) {
-	message := fmt.Sprintf("Starting background validation | Algorithm %d | Number of Chunks: %d | Number of Workers: %d", algo, chunkSize, numWorkers)
+	message := fmt.Sprintf("Background validation status | Algorithm %d | Number of Chunks: %d | Number of Workers: %d", algo, chunkSize, numWorkers)
 	ConsoleLogger(message)
 
 	// Get the total number of database items
-	start := time.Now()
 	var totalRows int64
 	err := db.QueryRow("SELECT COUNT(*) FROM Hashes").Scan(&totalRows)
 	if err != nil {
@@ -422,7 +421,7 @@ func ValidateDatabaseHashes(db *sql.DB, chunkSize int, numWorkers int, algo int)
 	// Process the validation results
 	go func() {
 		count := int64(0)
-		threshold := totalRows / 1000
+		threshold := totalRows / 100
 		if threshold < 1 {
 			threshold = 1
 		}
@@ -443,9 +442,17 @@ func ValidateDatabaseHashes(db *sql.DB, chunkSize int, numWorkers int, algo int)
 
 	wg.Wait()
 	close(results)
-	elapsed := time.Since(start)
-	message = fmt.Sprintf("Completed background validation in %s", elapsed)
-	ConsoleLogger(message)
+
+	// Check if the database is validated
+	err = db.QueryRow("SELECT COUNT(*) FROM Hashes WHERE validated = 1").Scan(&totalValidatedRows)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	if totalValidatedRows != totalRows {
+		ValidateDatabaseHashes(db, chunkSize, numWorkers, algo)
+	}
 }
 
 // ValidateHashItem is used to verify a HASH:PLAIN is correct and does not
