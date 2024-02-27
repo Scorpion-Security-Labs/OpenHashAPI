@@ -4,4 +4,4 @@ Project Owner: Jake Wnuk
 
 Documentation and Review: Dan King
 
-Code and Functionality Review: David Baker
+Code and Functionality Review: David E Baker

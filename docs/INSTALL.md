@@ -17,6 +17,7 @@
 
 ### Common Issues:
 - [Issues Running mysql_secure_installation](#issues-running-mysql_secure_installation)
+- [Issues Installing Docker](#issues-installing-docker)
 
 ---
 
@@ -50,6 +51,9 @@ The following shows running `mysql_secure_installation` after installing MySQL w
 
 ### Create the Database and Tables
 With `mysql` configured, the next step is configuring the database and associated tables. 
+
+> [!TIP]
+> In `config/examples` there are two scripts that can be used to create the database and replicate the following commands. They can be used with `cat create_database.sql | mysql (-u root -p)`.
 
 Suggest running these directly in `mysql`:
 ```
@@ -95,7 +99,7 @@ The commands can be executed as a MySQL script or directly through the command l
 Next, we will need a lower privilege database user named `ohauser` for the application. Ensure you have exited `mysql`.
 
 > [!IMPORTANT]
-> The password for the database user is validated to be at least 12 characters and meet complexity requirements with one lower, upper, digit, and special character.
+> The password for the database user is validated to be at least 12 characters and meet complexity requirements which require at least one lower, upper, digit, and special character.
 
 ```
 sudo mysql --execute "CREATE USER 'ohauser'@'localhost' IDENTIFIED BY 'password';"
@@ -304,8 +308,19 @@ sudo mysql --execute "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native
 sudo mysql -u root -p --execute "ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;"
 ```
 
-The commands above will allow the `root` account to authenticate with `sudo`. If you do not set this up, you may have to use `-u root -p` syntax instead:
+The commands above will allow the `root` account to authenticate with `sudo`. If you do not set this up you may have to use `-u root -p` syntax instead:
 ```
 sudo mysql -u root -p
 ```
+
+This syntax will be needed for the entire installation process pirot to the `--execute` commands.
+
+### Issues Installing Docker 
+
+Docker can have different installation requirements based on the underlying
+host operating system. These instructions will not be consistent for every
+installation so please refer to the offical Docker installation documentation
+for any issues.
+
+- [Offical install documentation](https://docs.docker.com/engine/install/) (external link)
 

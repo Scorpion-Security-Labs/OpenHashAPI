@@ -1,5 +1,5 @@
 CREATE DATABASE OpenHashAPI;
-USE OpenHashApi;
+USE OpenHashAPI;
 
 CREATE TABLE Hashes (
   algorithm      VARCHAR(8) NOT NULL,

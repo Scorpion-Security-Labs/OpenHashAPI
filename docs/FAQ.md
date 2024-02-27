@@ -155,4 +155,4 @@
   remove any that match the new filter.
 
 ## Why is the Database not Containerized?
-- The database is not containerized to ensure the database persists beyond application restarts. Additonally, some users will use the system to house billions of records, this level of performance can benefit from less layers of virtualization.
+- The database is not containerized to ensure the database persists beyond application restarts. Additonally, some users will use the system to house billions of records, this level of performance can benefit from fewer layers of virtualization.
