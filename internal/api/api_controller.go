@@ -21,6 +21,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ************************************************************************************************
+// *                                      /api/* API                                             *
+// ************************************************************************************************
+
 // HealthHandler is the endpoint handler for /api/health
 //
 // The endpoint expects an authorized GET request and returns metadata about
@@ -803,4 +807,66 @@ func EditListHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "file updated"})
 
 	}
+}
+
+// ************************************************************************************************
+// *                                      /api/manage/* API                                       *
+// ************************************************************************************************
+
+// ManageRefreshFilesHandler is the endpoint handler for api/manage/refresh/FILE
+//
+// The endpoint expects an authorized GET request and refreshes the target
+// FILE. The FILE can be "wordlist", "rules", or "masks".
+//
+// Args:
+// c (gin.Context): The Gin context object
+//
+// Returns:
+// None
+func ManageRefreshFilesHandler(c *gin.Context) {
+	filename := c.Param("filename")
+	if filename != "wordlist" && filename != "rules" && filename != "masks" {
+		customErr := models.ErrorStruct{Error: "Invalid value provided for filename", Message: fmt.Sprintf("Invalid value provided for filename: %q", filename), Context: "ManageRefreshFilesHandler"}
+		c.JSON(http.StatusBadRequest, customErr)
+		return
+	}
+
+	if filename == "wordlist" {
+		filename = "/var/www/OpenHashAPI/wordlist.txt"
+	} else if filename == "rules" {
+		filename = "/var/www/OpenHashAPI/rules.txt"
+	} else if filename == "masks" {
+		filename = "/var/www/OpenHashAPI/masks.txt"
+	}
+
+	db, err := auth.MySQLAuthenticate()
+	if err != nil {
+		customErr := models.ErrorStruct{Error: err.Error(), Message: "Database authentication failed", Context: "ManageRefreshFilesHandler"}
+		c.JSON(http.StatusInternalServerError, customErr)
+		return
+	}
+	// Not closing the database connection because it ends up being closed
+	// before the task is finished
+	//defer db.Close()
+
+	tasks := make(chan func(), 1)
+	go func() {
+		for task := range tasks {
+			task()
+		}
+	}()
+
+	if filename == "/var/www/OpenHashAPI/wordlist.txt" {
+		os.Remove(filename)
+		tasks <- func() { config.GenerateWordlistFile(db) }
+	} else if filename == "/var/www/OpenHashAPI/rules.txt" {
+		os.Remove(filename)
+		tasks <- func() { config.GenerateRulesFile(db) }
+	} else if filename == "/var/www/OpenHashAPI/masks.txt" {
+		os.Remove(filename)
+		tasks <- func() { config.GenerateMasksFile(db) }
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "file refresh started"})
+	close(tasks)
 }

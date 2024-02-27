@@ -60,6 +60,13 @@
     * `canManage`: Whether the user can manage other users' permissions.
     * `canViewUserLists`: If the user can view user lists on the server.
     * `canEditUserLists`: Whether the user can edit user lists on the server.
+### GET `/api/manage/refresh/FILE`
+- Refreshes the server's wordlists, masks, or rules.
+- Authenticated: `true`
+- Query Params: `none`
+- Access Role: `canManage` in user attributes
+- Parameters:
+    * `FILE`: The file to refresh.
 ### GET `/api/download/FILE/NUM`
 - Allows the download of files from the server.
 - FILE can be wordlist, mask, or rules. NUM is the number of results to return.

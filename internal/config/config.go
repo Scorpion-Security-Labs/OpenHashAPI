@@ -1237,7 +1237,7 @@ func LogEvent(funcName string, printEvent string) {
 //	(string): Unique ID
 //	(error): Error data
 func GenerateInsecureUniqueID() (string, error) {
-	mathrand.Seed(time.Now().UnixNano())
+	mathrand.New(mathrand.NewSource(time.Now().UnixNano()))
 	charset := "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 

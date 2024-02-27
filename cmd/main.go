@@ -93,6 +93,7 @@ func main() {
 	// PRIVATE ROUTES
 	private.GET("/health", api.HealthHandler)
 	private.GET("/download/:filename/:n", api.DownloadFileHandler)
+	private.GET("/manage/refresh/:filename", middleware.CanManageMiddleware(), api.ManageRefreshFilesHandler)
 	private.POST("/search", middleware.CanSearchMiddleware(), api.SearchHandler)
 	private.POST("/found", middleware.CanUploadMiddleware(), api.SubmitHashHandler)
 	private.POST("/manage", middleware.CanManageMiddleware(), auth.ManageUserHandler)

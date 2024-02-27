@@ -147,6 +147,44 @@
     </div>
   </div>
 
+<br>
+
+  <div class="container">
+    <h2>GET <code>/api/manage/refresh/FILE</code></h2>
+    
+    <div class="link-wrapper">
+      Refreshes the server's wordlist, rules, or masks files. <code>FILE</code>
+      can be <code>wordlist</code>, <code>rules</code>, and <code>masks</code>.
+      This will delete the current file and start a process to create a new one.
+
+      <br>
+      Authenticated: <code>true</code>
+      <br>
+      Query Params: <code>none</code>
+      <br>
+      Access Role: <code>canManage</code> in user attributes
+      <br>
+    </div>
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/manage/refresh/wordlist \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+    <br>
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/manage/refresh/rules \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+    <br>
+    <div id="curl-command">curl -X GET \
+      ${baseURL}/api/manage/refresh/masks \
+      -H 'Authorization: Bearer ${auth_token}'
+    </div>
+  </div>
+
+  </div>
+
+<br>
+
   <h1> POST Requests</h1>
 
   <div class="container">
