@@ -323,7 +323,7 @@ func RehashUpload(hashes []string, algo string) ([]interface{}, error) {
 //
 //	None
 func ValidateDatabaseHashes(db *sql.DB, chunkSize int, numWorkers int, algo int) {
-	message := fmt.Sprintf("Background validation status | Algorithm %d | Number of Chunks: %d | Number of Workers: %d", algo, chunkSize, numWorkers)
+	message := fmt.Sprintf("Background validation | Algorithm %d | Number of Chunks: %d | Number of Workers: %d", algo, chunkSize, numWorkers)
 	ConsoleLogger(message)
 
 	// Get the total number of database items
@@ -362,11 +362,11 @@ func ValidateDatabaseHashes(db *sql.DB, chunkSize int, numWorkers int, algo int)
 		go func() {
 			defer wg.Done()
 
-			for offset := range chunks {
+			for range chunks {
 
 				mu.Lock()
 
-				rows, err := db.Query("SELECT * FROM Hashes WHERE validated = false LIMIT ? OFFSET ?", chunkSize, offset)
+				rows, err := db.Query("SELECT * FROM Hashes WHERE validated = false LIMIT ?", chunkSize)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
@@ -385,7 +385,7 @@ func ValidateDatabaseHashes(db *sql.DB, chunkSize int, numWorkers int, algo int)
 					if errInvalid != nil {
 						// Attempt to delete items
 						maxRetries := 18
-						for i := 0; i < maxRetries; i++ {
+						for j := 0; j < maxRetries; j++ {
 							err = deleteItem(db, hash)
 							if err != nil {
 								if strings.Contains(err.Error(), "try restarting transaction") {
