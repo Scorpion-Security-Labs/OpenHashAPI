@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenHashAPI Authentication Page</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <img src="/static/logo.png" alt="Logo" class="logo">
+        <h1>Login</h1>
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <br>
+            <button type="button" id="login-button">Login</button>
+            <br>
+            <hr>
+            <br>
+            <button type="button" id="register-button">Register</button>
+        </form>
+        <div class="copyright">
+            &copy; 2024 All rights reserved.
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const loginButton = document.getElementById('login-button');
+        
+        loginButton.addEventListener('click', () => {
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+        
+          const data = {
+            username,
+            password,
+          };
+        
+          const jsonData = JSON.stringify(data);
+        
+          fetch('/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonData,
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.token) {
+                document.cookie = `auth_token=${data.token}; SameSite=Strict; Secure`;
+                window.location.href = '/home';
+              } else {
+                // Login failed
+                window.location.reload();
+              }
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        });
+
+        const registerButton = document.getElementById('register-button');
+
+        registerButton.addEventListener('click', () => {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+
+
+        const data = {
+        username,
+        password,
+          };
+        
+          const jsonData = JSON.stringify(data);
+        
+          fetch('/api/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonData,
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Registration successful:', data);
+              alert('Registration successful! You may now login.');
+              window.location.href = '/login';
+            })
+            .catch(error => {
+              const errorMessage = 'An error has occured: ensure the server is accepting registrations, the username is unique and not taken, and the password meets requirements.';
+              alert(errorMessage);
+            });
+        });
+
+    </script>
+</body>
+</html>
+
