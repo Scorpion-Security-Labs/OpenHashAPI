@@ -68,5 +68,5 @@ The following are defined API endpoints:
 
 ## OpenHashAPI Client:
 - The API can be communicated over HTTPS with any HTTP client
-- We offer a recommended client of [OpenHashAPI-Client](#) that can be used to
+- We offer a recommended client of [OpenHashAPI-Client](https://github.com/Scorpion-Security-Labs/OpenHashAPI-Client) that can be used to
   seamlessly communicate with the server.
